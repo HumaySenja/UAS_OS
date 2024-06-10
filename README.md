@@ -1,7 +1,7 @@
 # Program Simulasi Filesystem
 
 untuk menjalankan programnya 
-1. compile dulu gcc -o main Systemfile.c
+1. compile dulu dengan command "gcc -o main Systemfile.c"
 2. lalu jalanin "main"
 
 Berikut adalah daftar command yang dapat digunakan dalam program:
