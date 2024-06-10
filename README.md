@@ -33,8 +33,12 @@ Berikut adalah daftar command yang dapat digunakan dalam program:
 7. **Menampilkan Isi Direktori**:
    - Format: `list`
    - Deskripsi: Menampilkan daftar subdirektori dan file dalam direktori saat ini.
+   
+8. **Kembali ke directori sebelumnya:**:
+   - Format: `cd ..`
+   - Deskripsi: Mengubah direktori saat ini ke direktori sebelumnya.
 
-8. **Keluar dari Program**:
+9. **Keluar dari Program**:
    - Format: `exit`
    - Deskripsi: Keluar dari program dan membebaskan semua memori yang digunakan.
 
