@@ -1,15 +1,18 @@
+// import library yang diperlukan
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
 
 #define MAX_NAME 255
 
+// Struktur data untuk file
 typedef struct File
 {
     char name[MAX_NAME];
     struct File *next;
 } File;
 
+// Struktur data untuk direktori
 typedef struct Directory
 {
     char name[MAX_NAME];
@@ -19,16 +22,37 @@ typedef struct Directory
     File *files;
 } Directory;
 
+// Fungsi untuk membuat direktori baru
 Directory *create_directory(const char *name, Directory *parent);
+
+// Fungsi untuk membuat file baru
 File *create_file(const char *name);
+
+// Fungsi untuk menambahkan subdirektori ke dalam direktori tertentu
 void add_subdirectory(Directory *parent, Directory *subdir);
+
+// Fungsi untuk menambahkan file ke dalam direktori tertentu
 void add_file(Directory *dir, File *file);
+
+// Fungsi untuk mengubah direktori saat ini
 Directory *change_directory(Directory *current, const char *name);
+
+// Fungsi untuk menghapus file dari sebuah direktori
 void delete_file(Directory *dir, const char *name);
+
+// Fungsi untuk menghapus sebuah direktori beserta isinya
 void delete_directory(Directory *parent, const char *name);
+
+// Fungsi untuk mengubah nama sebuah direktori
 void rename_directory(Directory *dir, const char *new_name);
+
+// Fungsi untuk mengubah nama sebuah file
 void rename_file(File *file, const char *new_name);
+
+// Fungsi untuk menampilkan isi direktori
 void list_directory(Directory *dir);
+
+// Fungsi untuk menghapus semua struktur data direktori secara rekursif
 void free_directory(Directory *dir);
 
 Directory *create_directory(const char *name, Directory *parent)
@@ -52,15 +76,42 @@ File *create_file(const char *name)
 
 void add_subdirectory(Directory *parent, Directory *subdir)
 {
+    // Mengecek apakah sudah ada subdirektori dengan nama yang sama
+    Directory *existing_subdir = parent->subdirs;
+    while (existing_subdir)
+    {
+        if (strcmp(existing_subdir->name, subdir->name) == 0)
+        {
+            printf("Sudah ada direktori dengan nama tersebut\n");
+            return;
+        }
+        existing_subdir = existing_subdir->next;
+    }
+
+    // Jika tidak ada subdirektori dengan nama yang sama, tambahkan subdirektori baru
     subdir->next = parent->subdirs;
     parent->subdirs = subdir;
 }
 
 void add_file(Directory *dir, File *file)
 {
+    // Mengecek apakah sudah ada file dengan nama yang sama
+    File *existing_file = dir->files;
+    while (existing_file)
+    {
+        if (strcmp(existing_file->name, file->name) == 0)
+        {
+            printf("Sudah ada file dengan nama tersebut\n");
+            return;
+        }
+        existing_file = existing_file->next;
+    }
+
+    // Jika tidak ada file dengan nama yang sama, tambahkan file baru
     file->next = dir->files;
     dir->files = file;
 }
+
 
 Directory *change_directory(Directory *current, const char *name)
 {
@@ -74,7 +125,7 @@ Directory *change_directory(Directory *current, const char *name)
             return subdir;
         subdir = subdir->next;
     }
-    printf("Directory not found\n");
+    printf("Direktori tidak ditemukan\n");
     return current;
 }
 
@@ -95,7 +146,7 @@ void delete_file(Directory *dir, const char *name)
         prev = file;
         file = file->next;
     }
-    printf("File not found\n");
+    printf("File tidak ditemukan\n");
 }
 
 void delete_directory(Directory *parent, const char *name)
@@ -115,7 +166,7 @@ void delete_directory(Directory *parent, const char *name)
         prev = dir;
         dir = dir->next;
     }
-    printf("Directory not found\n");
+    printf("Direktori tidak ditemukan\n");
 }
 
 void rename_directory(Directory *dir, const char *new_name)
@@ -130,7 +181,7 @@ void rename_file(File *file, const char *new_name)
 
 void list_directory(Directory *dir)
 {
-    printf("Current Directory: %s\n", dir->name);
+    printf("Direktori saat ini: %s\n", dir->name);
     printf("Subdirectories:\n");
     Directory *subdir = dir->subdirs;
     while (subdir)
@@ -164,8 +215,10 @@ void free_directory(Directory *dir)
     free(dir);
 }
 
+
 int main()
 {
+    // Membuat direktori root
     Directory *root = create_directory("root", NULL);
     Directory *current = root;
 
@@ -176,31 +229,38 @@ int main()
     {
         printf("\n%s> ", current->name);
         fgets(command, sizeof(command), stdin);
-        command[strcspn(command, "\n")] = 0; // Remove trailing newline
+        command[strcspn(command, "\n")] = 0; // Menghapus karakter newline dari input
 
+        // Memproses perintah
         if (sscanf(command, "mkdir %s", arg1) == 1)
         {
+            // Menambahkan subdirektori baru
             add_subdirectory(current, create_directory(arg1, current));
         }
         else if (sscanf(command, "cd %s", arg1) == 1)
         {
+            // Mengubah direktori saat ini
             current = change_directory(current, arg1);
         }
         else if (sscanf(command, "mkfile %s", arg1) == 1)
         {
+            // Menambahkan file baru
             add_file(current, create_file(arg1));
         }
         else if (sscanf(command, "rmfile %s", arg1) == 1)
         {
+            // Menghapus file
             delete_file(current, arg1);
         }
         else if (sscanf(command, "rmdir %s", arg1) == 1)
         {
+            // Menghapus direktori
             delete_directory(current, arg1);
         }
         else if (sscanf(command, "rename %s %s", arg1, arg2) == 2)
         {
-            // Try renaming directory first
+            // Mengubah nama direktori atau file
+            // Coba mengubah nama direktori terlebih dahulu
             Directory *subdir = current->subdirs;
             while (subdir)
             {
@@ -211,7 +271,7 @@ int main()
                 }
                 subdir = subdir->next;
             }
-            // If no directory found, try renaming file
+            // Jika tidak ditemukan direktori, coba mengubah nama file
             if (!subdir)
             {
                 File *file = current->files;
@@ -225,15 +285,17 @@ int main()
                     file = file->next;
                 }
                 if (!file)
-                    printf("File or Directory not found\n");
+                    printf("File atau Direktori tidak ditemukan\n");
             }
         }
         else if (strcmp(command, "list") == 0)
         {
+            // Menampilkan isi direktori
             list_directory(current);
         }
         else if (strcmp(command, "exit") == 0)
         {
+            // Membebaskan memori dan keluar dari program
             free_directory(root);
             return 0;
         }
